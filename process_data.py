@@ -7,7 +7,6 @@ smiles_col = 'Ligand SMILES'
 TargetName_col = 'Target Name'
 IC50_col = 'IC50 (nM)'
 
-df = df.drop_duplicates(subset=['Ligand SMILES'], keep='first')
 
 #Filter Targets
 filtered_data = df[df[TargetName_col].str.contains('Fibroblast growth factor receptor 1', na=False)]
@@ -20,11 +19,11 @@ filtered_data[IC50_col] = pd.to_numeric(filtered_data[IC50_col], errors='coerce'
 
 filtered_data['Label'] = filtered_data[IC50_col].apply(lambda x: 1 if x <= 100 else 0)
 
+filtered_data = filtered_data.drop_duplicates(subset=['Ligand InChI Key'], keep='first')
 
+result_data = filtered_data[['BindingDB Reactant_set_id','Ligand SMILES', 'Ligand InChI Key','Target Name', 'IC50 (nM)', 'Label']]
 
-result_data = filtered_data[['BindingDB Reactant_set_id','Ligand SMILES', 'Target Name', 'IC50 (nM)', 'Label']]
+output_file = './data/filtered_data.csv'  
+result_data.to_csv(output_file, index=False)  
 
-output_file = 'filtered_data.csv'  # 输出文件名
-result_data.to_csv(output_file, index=False)  # 保存为 CSV 文件，不保存索引
-
-print(f"处理完成，结果已保存到 {output_file}")
+print(f"The processing is completed, the filtered data is saved to {output_file}")
