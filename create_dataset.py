@@ -3,7 +3,7 @@ from torch_geometric.data import Dataset, DataLoader
 from torch_geometric import data as DATA
 from torch_geometric.transforms import Compose
 
-class GCNDataset(Dataset):
+class VSDataset(Dataset):
     def __init__(self, data_path, transform=None):
         self.data_path = data_path
         self.transform = transform
