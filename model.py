@@ -12,12 +12,12 @@ class GCNnet(nn.Module):
         self.conv2 = GCNConv(num_features, num_features*2)
         self.conv3 = GCNConv(num_features*2, num_features*4)
         
-        self.relu = Relu()
+        self.relu = ReLU()
         self.fc1 = Linear(num_features*4, output_dim)
         self.fc2 = Linear(output_dim, n_output)
         
-        self.dropout = nn.Dropout(dropout)
-        self.out = F.softmax() 
+        self.dropout = Dropout(dropout)
+
         
     def forward(self, data):
 
