@@ -4,13 +4,14 @@ from torch_geometric import data as DATA
 from torch_geometric.transforms import Compose
 from rdkit import Chem
 from rdkit.Chem import MolFromSmiles
+import pandas as pd
 import networkx as nx
 
 from utils import *
 
 class VSDataset(Dataset):
-    def __init__(self, data_path, transform=None):
-        self.data_path = data_path
+    def __init__(self, csv_path, transform=None):
+        self.df = pd.read_csv(csv_path)
         self.transform = transform
 
 
