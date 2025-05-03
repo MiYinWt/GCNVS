@@ -10,23 +10,22 @@ import networkx as nx
 from utils import *
 
 class VSDataset(Dataset):
-    def __init__(self, csv_path, transform=None):
+    def __init__(self, csv_path):
         self.df = pd.read_csv(csv_path)
-        self.transform = transform
+
 
 
     def __len__(self):
-        return len(self.data_list)
+        return len(self.df)
+    
+    def process(self):
+        data = self.df
 
-    def __getitem__(self, idx):
-        data = self.data_list[idx]
-        if self.transform:
-            data = self.transform(data)
-        return data
-
+        return super().process()
 
 
 def smile_to_graph(smile):
+
     mol = Chem.MolFromSmiles(smile)
     
     c_size = mol.GetNumAtoms()
@@ -45,3 +44,5 @@ def smile_to_graph(smile):
         edge_index.append([e1, e2])
         
     return c_size, features, edge_index
+
+# convert dataset to Pytorch Geometric DataLoader

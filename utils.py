@@ -11,7 +11,7 @@ def atom_features(atom):
                     one_of_k_encoding_unk(atom.GetTotalNumHs(), [0, 1, 2, 3, 4, 5]) +
                     one_of_k_encoding_unk(atom.GetTotalValence(), [0, 1, 2, 3, 4, 5, 6]) +
                     one_of_k_encoding_unk(atom.GetHybridization(),['SP', 'SP2', 'SP3', 'SP3D', 'SP3D2','Unknown']) +
-                    [atom.atom.IsInRing()]+
+                    [atom.IsInRing()]+
                     [atom.GetIsAromatic()])
 
 def one_of_k_encoding(x, allowable_set):
