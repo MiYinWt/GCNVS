@@ -1,4 +1,5 @@
 import pandas as pd
+from utils import *
 
 df = pd.read_csv('./data/BindingDB_All.tsv',sep='\t', low_memory=False)
 
@@ -32,12 +33,17 @@ print(f"The processing is completed, the filtered data is saved to {output_file}
 
 result_data = pd.read_csv('./data/filtered_data.csv')
 
+result_data['smiles'] = result_data['Ligand SMILES'].apply(canonicalize_smiles)
+
+result_data = result_data[result_data['smiles'].notna()]
+
 active_data = result_data[result_data['Label'] == 1]
 
 inactive_data = result_data[result_data['Label'] == 0]
 
 print(f"Active data count: {len(active_data)}")
 print(f"Inactive data count: {len(inactive_data)}")
+
 
 
 # train_dataset

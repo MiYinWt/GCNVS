@@ -19,15 +19,15 @@ class GCNnet(nn.Module):
 
         
     def forward(self, data):
-        x, edge_index = data.x, data.edge_index
+        x, edge_index, edge_weights = data.x, data.edge_index ,data.edge_weights
 
-        x = self.conv1(x, edge_index)
+        x = self.conv1(x, edge_index, edge_weights)
         x = self.relu(x)
 
-        x = self.conv2(x, edge_index)
+        x = self.conv2(x, edge_index, edge_weights)
         x = self.relu(x)
 
-        x = self.conv3(x, edge_index)
+        x = self.conv3(x, edge_index, edge_weights)
         x = self.relu(x)
         x = torch.mean(x, dim=0, keepdim=True)
 
