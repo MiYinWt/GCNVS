@@ -19,16 +19,13 @@ class VSDataset(Dataset):
         self.dataset_type = dataset_type
         self.data_list = []
 
-        # 在初始化时加载数据列表
         self.load_data()
 
-        # 检查数据列表是否为空
         if not self.data_list:
             print(f"No data found for {self.dataset_type} dataset. Processing data...")
             self.process()
             self.load_data()
 
-        # 打印数据集信息
         print(f"{self.dataset_type} dataset loaded with {len(self.data_list)} samples.")
 
     def load_data(self):
