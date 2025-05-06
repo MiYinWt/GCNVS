@@ -17,7 +17,27 @@ class VSDataset(Dataset):
         self.df = pd.read_csv(csv_path)
         self.processed_dir = processed_dir
         self.dataset_type = dataset_type
+        self.data_list = []
 
+        # 在初始化时加载数据列表
+        self.load_data()
+
+        # 检查数据列表是否为空
+        if not self.data_list:
+            print(f"No data found for {self.dataset_type} dataset. Processing data...")
+            self.process()
+            self.load_data()
+
+        # 打印数据集信息
+        print(f"{self.dataset_type} dataset loaded with {len(self.data_list)} samples.")
+
+    def load_data(self):
+        data_path = os.path.join(self.processed_dir, f'{self.dataset_type}_data.pt')
+        if os.path.exists(data_path):
+            self.data_list = torch.load(data_path)
+        else:
+            self.data_list = []
+        
     def __len__(self):
         return len(self.df)
     
@@ -26,21 +46,24 @@ class VSDataset(Dataset):
         smile_list = data['smiles'].tolist()
         y_list = data['Label'].tolist()
         ## print(f"smile_list length: {len(smile_list)}")
-        assert len(smile_list) == len(y_list), "smile and y list length must equal"
+        assert len(smile_list) == len(y_list), "smile and label length must equal"
         data_list = []
         for i in range(len(smile_list)):
             ## print(smile_list[i])
-            x , edge_index, edge_weights = smile_to_graph(smile_list[i])
+            c_size, x, edge_index, edge_weights = smile_to_graph(smile_list[i])
             y = y_list[i]
-            data = DATA.Data(x=x, edge_index=edge_index, edge_weights=edge_weights, y=y)
+            data = DATA.Data(x=torch.Tensor(x), edge_index=torch.LongTensor(edge_index).transpose(1, 0), edge_weights=torch.FloatTensor(edge_weights),y=torch.FloatTensor(y))
+            data.__setitem__('c_size', torch.LongTensor([c_size]))
             data_list.append(data)
         torch.save(data_list, os.path.join(self.processed_dir, f'{self.dataset_type}_data.pt'))
 
+    def __getitem__(self, idx):
+         return self.data_list[idx]
 
 
 def smile_to_graph(smile):
     mol = Chem.MolFromSmiles(smile)
-    
+    c_size = mol.GetNumAtoms()
     features = []
 
     for atom in mol.GetAtoms():
@@ -56,7 +79,7 @@ def smile_to_graph(smile):
         edge_index.append([e1, e2])
         edge_weights.append(bond_weight(bond))
 
-    return features, edge_index , edge_weights
+    return c_size, features, edge_index , edge_weights
 
 # convert dataset to Pytorch Geometric DataLoader
 print("Loading dataset in pytorch geometric format...")
@@ -70,4 +93,4 @@ test_dataset.process()
 val_dataset = VSDataset(csv_path='./data/val.csv', processed_dir='data/', dataset_type='val')
 val_dataset.process()
 
-print("All Dataset loaded.")
+print("All Dataset loaded")
