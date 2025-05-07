@@ -7,7 +7,7 @@ from torch_geometric.loader import DataLoader
 from model import GCNnet
 from utils import *
 
-TRAIN_BATCH_SIZE = 512
+TRAIN_BATCH_SIZE = 1
 TEST_BATCH_SIZE = 512
 LR = 0.0002
 LOG_INTERVAL = 10
@@ -16,7 +16,7 @@ cuda_name = 'cuda:0'
 
 def train(model, device, train_loader, optimizer, epoch):
     loss_fn = nn.MSELoss()
-    print('Training on {} samples...'.format(len(train_loader)))
+    print('Training on {} samples...'.format(len(train_loader.dataset)))
     model.train()
     for batch_idx, data in enumerate(train_loader):
         data = data.to(device)
@@ -28,7 +28,7 @@ def train(model, device, train_loader, optimizer, epoch):
         if batch_idx % LOG_INTERVAL == 0:
             print('Train epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(epoch,
                                                                            batch_idx * len(data.x),
-                                                                           len(train_loader),
+                                                                           len(train_loader.dataset),
                                                                            100. * batch_idx / len(train_loader),
                                                                            loss.item()))
             
@@ -56,7 +56,8 @@ else:
     train_data = torch.load(processed_data_file_train)
     test_data = torch.load(processed_data_file_test)
     # make data PyTorch mini-batch processing ready
-    train_loader = DataLoader(train_data, batch_size=TRAIN_BATCH_SIZE, shuffle=True)
+    train_loader = DataLoader(train_data, batch_size=TRAIN_BATCH_SIZE, shuffle=False)
+
     test_loader = DataLoader(test_data, batch_size=TEST_BATCH_SIZE, shuffle=False)
 
     # training the model

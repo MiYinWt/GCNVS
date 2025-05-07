@@ -50,7 +50,6 @@ class VSDataset(Dataset):
             c_size, x, edge_index, edge_weights = smile_to_graph(smile_list[i])
             y = y_list[i]
             data = DATA.Data(x=torch.Tensor(x), edge_index=torch.LongTensor(edge_index).transpose(1, 0), edge_weights=torch.FloatTensor(edge_weights),y=torch.FloatTensor(y))
-            data.__setitem__('c_size', torch.LongTensor([c_size]))
             data_list.append(data)
         torch.save(data_list, os.path.join(self.processed_dir, f'{self.dataset_type}_data.pt'))
 
@@ -79,15 +78,15 @@ def smile_to_graph(smile):
     return c_size, features, edge_index , edge_weights
 
 # convert dataset to Pytorch Geometric DataLoader
-print("Loading dataset in pytorch geometric format...")
+# print("Loading dataset in pytorch geometric format...")
 
-train_dataset = VSDataset(csv_path='./data/train.csv', processed_dir='data/', dataset_type='train')
-train_dataset.process()
+# train_dataset = VSDataset(csv_path='./data/train.csv', processed_dir='data/', dataset_type='train')
+# train_dataset.process()
 
-test_dataset = VSDataset(csv_path='./data/test.csv', processed_dir='data/', dataset_type='test')
-test_dataset.process()
+# test_dataset = VSDataset(csv_path='./data/test.csv', processed_dir='data/', dataset_type='test')
+# test_dataset.process()
 
-val_dataset = VSDataset(csv_path='./data/val.csv', processed_dir='data/', dataset_type='val')
-val_dataset.process()
+# val_dataset = VSDataset(csv_path='./data/val.csv', processed_dir='data/', dataset_type='val')
+# val_dataset.process()
 
-print("All Dataset loaded")
+# print("All Dataset loaded")
