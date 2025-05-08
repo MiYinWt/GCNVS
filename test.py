@@ -5,7 +5,7 @@ import rdkit
 import rdkit.Chem as Chem
 from utils import *
 from torch_geometric import data as DATA
-from create_dataset import smile_to_graph
+from dataset import smile_to_graph
 processed_data_file_train = 'data/train_data.pt'
 
 train_data = torch.load(processed_data_file_train)
