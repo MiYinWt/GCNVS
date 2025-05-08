@@ -5,15 +5,15 @@ from torch_geometric.nn import GCNConv,global_max_pool as gmp
 
 
 class GCNnet(nn.Module):
-    def __init__(self, num_features=40, n_output=1, output_dim=128, dropout= 0.2):
+    def __init__(self, num_features=40, output_dim=128, dropout= 0.2):
         super(GCNnet, self).__init__()
         self.conv1 = GCNConv(num_features, num_features)
         self.conv2 = GCNConv(num_features, num_features*2)
         self.conv3 = GCNConv(num_features*2, num_features*4)
         
         self.relu = ReLU()
-        self.fc1 = Linear(num_features*4, output_dim)
-        self.fc2 = Linear(output_dim, n_output)
+        self.fc1 = Linear(num_features*4, 512)
+        self.fc2 = Linear(512, output_dim)
         
         self.dropout = Dropout(dropout)
 
