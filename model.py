@@ -13,7 +13,7 @@ class GCNnet(nn.Module):
         
         self.relu = ReLU()
         self.fc1 = Linear(num_features*4, 512)
-        self.fc2 = Linear(512, output_dim)
+        self.fc2 = Linear(512, 1)
         
         self.dropout = Dropout(dropout)
 

@@ -8,7 +8,15 @@ from model import GCNnet
 from utils import *
 
 
-TRAIN_BATCH_SIZE = 1
+
+# train_data,train_label = proccesed_data('data/train.csv')
+
+
+# train_loader = DataLoader(VSDataset(train_data,train_label),batch_size=512, shuffle=False)
+
+
+
+TRAIN_BATCH_SIZE = 512
 TEST_BATCH_SIZE = 512
 LR = 0.0002
 LOG_INTERVAL = 10
@@ -51,7 +59,7 @@ train_data,train_label = proccesed_data('data/train.csv')
 test_data,test_label = proccesed_data('data/test.csv')
 val_data,val_label = proccesed_data('data/val.csv')
 
-train_loader = DataLoader(VSDataset(train_data,train_label),batch_size=512, shuffle=False)
+train_loader = DataLoader(VSDataset(train_data,train_label),batch_size=512, shuffle=True)
 test_loader = DataLoader(VSDataset(test_data,test_label), batch_size=512, shuffle=False)
 
 device = torch.device(cuda_name if torch.cuda.is_available() else "cpu")
@@ -70,7 +78,7 @@ for epoch in range(NUM_EPOCHS):
         torch.save(model.state_dict(), model_file_name)
         with open(result_file_name,'w') as f:
             f.write(','.join(map(str,ret)))
-        best_epoch = epoch+1
+        best_epoch = epoch+1 
         best_mse = ret[1]
         print('rmse improved at epoch ', best_epoch, '; best_mse,best_ci:', best_mse)
     else:
