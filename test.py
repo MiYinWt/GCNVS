@@ -3,17 +3,15 @@ import torch
 import torch.nn as nn
 import rdkit
 import rdkit.Chem as Chem
+from torch_geometric.loader import DataLoader
 from utils import *
 from torch_geometric import data as DATA
-from dataset import smile_to_graph
-processed_data_file_train = 'data/train_data.pt'
+from dataset import *
 
-train_data = torch.load(processed_data_file_train)
+train_data,train_label = proccesed_data('data/train.csv')
 
-print(train_data[0])
+train_loader = DataLoader(VSDataset(train_data,train_label),batch_size=512, shuffle=True)
 
-# smiles= 'COc1cc(CCc2cc(-c3nc4ccc(N5CCN(C)CC5)cc4[nH]3)n[nH]2)cc(OC)c1'
-# c_size, x, edge_index, edge_weights = smile_to_graph(smiles)
-
-# data = DATA.Data(x=torch.Tensor(x), edge_index=torch.LongTensor(edge_index).transpose(1, 0), edge_weights=torch.FloatTensor(edge_weights),y=torch.FloatTensor(1))
-# print(data)
+for batch_idx,data in enumerate(train_loader):
+    if batch_idx % 2 == 0:
+        print(data.y.view(-1, 1).float())
