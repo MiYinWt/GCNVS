@@ -15,18 +15,23 @@ train_data,train_label = proccesed_data('data/train.csv')
 
 train_loader = DataLoader(VSDataset(train_data,train_label),batch_size=2, shuffle=False)
 
-def train(model,device,train_loader,optimizer,criterion):
+def train(model,device,train_loader,epoch,optimizer):
+    loss = nn.CrossEntropyLoss()
+    device = device
+    model = model.to(device)
     model.train()
-    for data in train_loader:
-        data = data.to(device)
-        optimizer.zero_grad()
-        out = model(data)
-        loss = criterion(out, data.y)
-        loss.backward()
-        optimizer.step()
+    epoch = epoch
+    optimizer = optimizer
+    for i in range(epoch):
+        for data in train_loader:
+            data = data.to(device)
+            
+            optimizer.zero_grad() 
+            loss.backward()
+            optimizer.step()
     return loss.item()
 
-# device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
+device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
 # model = GCNnet().to(device)
 
 

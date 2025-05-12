@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
-from torch.nn import Linear, ReLU, Dropout, Softmax
-from torch_geometric.nn import GCNConv,global_max_pool as gmp
+from torch.nn import Linear, ReLU, Dropout
+import torch.nn.functional as F
+from torch_geometric.nn import GCNConv,global_mean_pool as gmp
 
 
 class GCNnet(nn.Module):
@@ -9,11 +10,11 @@ class GCNnet(nn.Module):
         super(GCNnet, self).__init__()
         self.conv1 = GCNConv(num_features, num_features)
         self.conv2 = GCNConv(num_features, num_features*2)
-        self.conv3 = GCNConv(num_features*2, num_features*4)
+        self.conv3 = GCNConv(num_features*2, output_dim)
         
         self.relu = ReLU()
-        self.fc1 = Linear(num_features*4, 512)
-        self.fc2 = Linear(512, 1)
+        self.fc1 = Linear(output_dim, 512)
+        self.fc2 = Linear(512, 2)
         
         self.dropout = Dropout(dropout)
 
@@ -38,7 +39,6 @@ class GCNnet(nn.Module):
         x = self.fc2(x)
         x = self.dropout(x)
 
-        softmax = Softmax(dim=1)
-        out = softmax(x)
+        out = F.softmax(x,dim=1)
 
         return out
