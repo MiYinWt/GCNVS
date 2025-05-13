@@ -9,7 +9,6 @@ from model import GCNnet
 from utils import *
 
 
-
 train_data,train_label = proccesed_data('data/train.csv')
 test_data,test_label = proccesed_data('data/test.csv')
 
