@@ -17,10 +17,6 @@ train_loader = DataLoader(VSDataset(train_data,train_label),batch_size=512, shuf
 test_loader = DataLoader(VSDataset(test_data,test_label),batch_size=512, shuffle=False)
 
 
-train_loader = DataLoader(VSDataset(train_data,train_label),batch_size=512, shuffle=True)
-test_loader = DataLoader(VSDataset(test_data,test_label),batch_size=512, shuffle=False)
-
-
 def train(model,device,train_loader,epochs,optimizer):  
     loss_fn = nn.CrossEntropyLoss()
     model = model.to(device)
@@ -43,6 +39,8 @@ def train(model,device,train_loader,epochs,optimizer):
 
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
-# model = GCNnet().to(device)
+
+
+train(GCNnet(),device,train_loader,500,torch.optim.Adam(GCNnet().parameters(),lr=0.002))
 
 
