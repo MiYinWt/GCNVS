@@ -29,12 +29,12 @@ class VSDataset(Dataset):
 
 def smile_to_graph(smile):
     mol = Chem.MolFromSmiles(smile)
-    c_size = mol.GetNumAtoms()
     features = []
 
     for atom in mol.GetAtoms():
         feature = atom_features(atom)
-        features.append( feature / sum(feature) )
+        # features.append( feature / sum(feature) )
+        features.append( feature )
 
 
     edge_index = []
@@ -45,7 +45,7 @@ def smile_to_graph(smile):
         edge_index.append([e1, e2])
         edge_weights.append(bond_weight(bond))
 
-    return c_size, features, edge_index , edge_weights
+    return  features, edge_index , edge_weights
 
 
 def proccesed_data(data_path):
@@ -55,7 +55,7 @@ def proccesed_data(data_path):
     assert len(smiles) == len(labels), "Number of SMILES and labels must match"
     data_list = []
     for i in range(len(smiles)):
-        c_size, features, edge_index , edge_weights = smile_to_graph(smiles[i])
+        features, edge_index , edge_weights = smile_to_graph(smiles[i])
         data = DATA.Data(x=torch.tensor(features, dtype=torch.float), 
                           edge_index=torch.tensor(edge_index, dtype=torch.long).t().contiguous(), 
                           edge_weights=torch.tensor(edge_weights, dtype=torch.float),

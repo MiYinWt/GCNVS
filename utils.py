@@ -24,15 +24,16 @@ def bond_weight(bond):
     else:
         return 0.0   #unknown bond type
 
+
+
 def atom_features(atom):
-    return np.array(one_of_k_encoding_unk(atom.GetSymbol(),['C', 'N', 'O', 'S', 'F', 'P', 'Cl', 'Br', 'I', 'B', 'H', 'Unknown']) +
-                    one_of_k_encoding(atom.GetDegree(), [0, 1, 2, 3, 4, 5, 6]) +
-                    one_of_k_encoding_unk(atom.GetTotalNumHs(), [0, 1, 2, 3, 4, 5]) +
-                    one_of_k_encoding_unk(atom.GetTotalValence(), [0, 1, 2, 3, 4, 5, 6]) +
-                    one_of_k_encoding_unk(atom.GetHybridization(),['SP', 'SP2', 'SP3', 'SP3D', 'SP3D2','Unknown']) +
+    return np.array(one_of_k_encoding_unk(atom.GetSymbol(),['C', 'N', 'O', 'S', 'F', 'Cl', 'Br', 'I',  'H']) +
+                    one_of_k_encoding(atom.GetDegree(), [0, 1, 2, 3, 4]) +
+                    one_of_k_encoding_unk(atom.GetTotalNumHs(), [0, 1, 2, 3]) +
+                    one_of_k_encoding_unk(atom.GetTotalValence(), [ 1, 2, 3, 4, 5, 6]) +
                     [atom.IsInRing()]+
                     [atom.GetIsAromatic()])
-
+                    
 def one_of_k_encoding(x, allowable_set):
     if x not in allowable_set:
         raise Exception("input {0} not in allowable set{1}:".format(x, allowable_set))
