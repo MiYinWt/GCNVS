@@ -36,15 +36,15 @@ def smile_to_graph(smile):
         # features.append( feature / sum(feature) )
         features.append( feature )
 
-
     edge_index = []
     edge_weights = []
     for bond in mol.GetBonds():
         e1 = bond.GetBeginAtomIdx()
         e2 = bond.GetEndAtomIdx()
         edge_index.append([e1, e2])
+        edge_index.append([e2, e1])
         edge_weights.append(bond_weight(bond))
-
+        edge_weights.append(bond_weight(bond))
     return  features, edge_index , edge_weights
 
 
@@ -52,7 +52,8 @@ def proccesed_data(data_path):
     df = pd.read_csv(data_path)
     smiles = df['Ligand SMILES'].tolist()
     labels = df['Label'].tolist()
-    assert len(smiles) == len(labels), "Number of SMILES and labels must match"
+    ##   Number of SMILES and labels must match
+    assert len(smiles) == len(labels)
     data_list = []
     for i in range(len(smiles)):
         features, edge_index , edge_weights = smile_to_graph(smiles[i])

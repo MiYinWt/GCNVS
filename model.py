@@ -16,22 +16,27 @@ class GCNnet(nn.Module):
         self.fc2 = Linear(64, 2)
         self.dropout = Dropout(dropout)
 
+    #def init
         
     def forward(self, data):
         x, edge_index, edge_weights,batch = data.x, data.edge_index ,data.edge_weights,data.batch
+        #print("x:\n",x,edge_weights)
         x = self.conv1(x, edge_index, edge_weights)
-        x = self.conv2(x, edge_index, edge_weights)
-        x = self.conv3(x, edge_index, edge_weights)
-
+        #print("conv1:\n",x,edge_weights)
         x = self.relu(x)
-        x = self.dropout(x)
+        x = self.conv2(x, edge_index, edge_weights)
+        #print("conv2:\n",x)
+        x = self.relu(x)
+        x = self.conv3(x, edge_index, edge_weights)
+        #print("conv3:\n",x)
+        x = self.relu(x)
+       # x = self.dropout(x)
 
         x = gmp(x, batch)
-        x = self.fc1(x)
-        
-        x = self.relu(x)
-        out = self.fc2(x)
 
-        #out = F.softmax(x,dim=1)
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        out = F.softmax(x,dim=1)
 
         return out

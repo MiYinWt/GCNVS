@@ -8,9 +8,9 @@ from utils import *
 from torch_geometric import data as DATA
 from dataset import *
 
-train_data,train_label = proccesed_data('data/total.csv')
+train_data,train_label = proccesed_data('data/train.csv')
 
 train_loader = DataLoader(VSDataset(train_data,train_label),shuffle=False)
 for data in train_loader:
-    print("data:\n",data.x)
+    print("data:\n",data.edge_index,data.edge_weights)
     break
