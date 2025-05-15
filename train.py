@@ -11,7 +11,7 @@ from utils import *
 
 def train(model,device,train_loader,epoch,optimizer):  
     # loss_fn = torch.nn.CrossEntropyLoss(label_smoothing=0.1)
-    loss_fn = torch.nn.BCELoss()
+    loss_fn = torch.nn.BCEWithLogitsLoss()
     model = model.to(device)
     model.train()
 
@@ -31,34 +31,34 @@ def train(model,device,train_loader,epoch,optimizer):
                                                                     loss.item()))
 
 
-# def test(model, device, test_loader):
-#     model.eval()  
-#     model.to(device)
-#     correct = 0
-#     total = 0
-#     with torch.no_grad():  
-#         for data in test_loader:
-#             data = data.to(device)
-#             out = model(data)
-#             print("out:\n",out)
-#             pred = torch.argmax(out, dim=1)
-#             print("pred:\n",pred)  
-#             correct += (pred == data.y).sum().item()
-#             total += data.y.size(0)
-#     accuracy = 100. * correct / total
-#     print(f'Test Accuracy: {accuracy:.2f}%')
+def test(model, device, test_loader):
+    model.eval()  
+    model.to(device)
+    correct = 0
+    total = 0
+    with torch.no_grad():  
+        for data in test_loader:
+            data = data.to(device)
+            out = model(data)
+            print("out:\n",out)
+            pred = torch.nn.Sigmoid()(out)
+            print("pred:\n",pred)  
+            correct += (pred == data.y).sum().item()
+            total += data.y.size(0)
+    accuracy = 100. * correct / total
+    print(f'Test Accuracy: {accuracy:.2f}%')
 
 
 
 
-NUM_EPOCHS = 500
+NUM_EPOCHS = 200
 
 train_data,train_label = proccesed_data('data/train.csv')
 test_data,test_label = proccesed_data('data/test.csv')
 val_data,val_label = proccesed_data('data/val.csv')
 
 train_loader = DataLoader(VSDataset(train_data,train_label),batch_size=64, shuffle=True)
-test_loader = DataLoader(VSDataset(test_data,test_label),batch_size=64, shuffle=False)
+test_loader = DataLoader(VSDataset(test_data,test_label),batch_size=64, shuffle=True)
 val_loader = DataLoader(VSDataset(val_data,val_label),batch_size=64, shuffle=False)
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
@@ -70,4 +70,4 @@ for i in range(NUM_EPOCHS):
     train(model, device, train_loader, i+1, optimizer)
 
 
-# test(model, device, test_loader)
+test(model, device, test_loader)

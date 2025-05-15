@@ -24,6 +24,7 @@ class GCNnet(nn.Module):
         self.fc2 = Linear(32, 1)
         self.dropout = Dropout(dropout)
         self.bn1 = nn.BatchNorm1d(128)
+        self.bn2 = nn.BatchNorm1d(128)
 
     def forward(self, data):
         x, edge_index, edge_weights,batch = data.x, data.edge_index ,data.edge_weights,data.batch
@@ -33,7 +34,7 @@ class GCNnet(nn.Module):
         x = self.bn1(x)
         # x = self.relu(x)
         x = self.conv2(x, edge_index, edge_weights)
-        x = self.bn1(x)
+        x = self.bn2(x)
         # x = self.relu(x)
         x = self.conv3(x, edge_index, edge_weights)
 
@@ -46,8 +47,8 @@ class GCNnet(nn.Module):
         x = self.relu(x)
         x = self.dropout(x)
         out = self.fc2(x)
-        out = self.sigmoid(out)
+        # out = self.sigmoid(out)
         out = out.view(-1)
-        #out = F.softmax(x,dim=1)
+        # out = F.softmax(x,dim=1)
 
         return out
