@@ -15,6 +15,7 @@ def train(model,device,train_loader,epoch,optimizer):
     model = model.to(device)
     model.train()
 
+    total_loss = 0
     for batch_idx,data in enumerate(train_loader):
         data = data.to(device)
         out = model(data)
@@ -24,11 +25,11 @@ def train(model,device,train_loader,epoch,optimizer):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
+        total_loss += loss.item()
     print('Train epoch: {:5d} /{:5d} [{:3.2f}%]\tLoss: {:.6f}'.format(epoch,
                                                                     NUM_EPOCHS,
                                                                     100. * (epoch) / NUM_EPOCHS,
-                                                                    loss.item()))
+                                                                    total_loss / len(train_loader)))
 
 
 def test(model, device, test_loader):
