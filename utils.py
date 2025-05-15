@@ -25,38 +25,19 @@ def bond_weight(bond):
         return 0.0   #unknown bond type
 
 
-
 def atom_features(atom):
-    return np.array(one_of_k_encoding_unk(atom.GetSymbol(),['C', 'N', 'O', 'S', 'F', 'Cl', 'Br', 'I',  'H']) +
-                    one_of_k_encoding(atom.GetDegree(), [0, 1, 2, 3, 4]) +
-                    one_of_k_encoding_unk(atom.GetTotalNumHs(), [0, 1, 2, 3]) +
-                    one_of_k_encoding_unk(atom.GetTotalValence(), [ 1, 2, 3, 4, 5, 6]) +
-                    [atom.IsInRing()]+
-                    [atom.GetIsAromatic()])
+    return np.array(one_of_k_encoding(atom.GetSymbol(),['C', 'N', 'O', 'S', 'F', 'P', 'Cl', 'Br', 'I', 'H']) +
+                    one_of_k_encoding(atom.GetDegree(), [0, 1, 2, 3, 4, 5]) +
+                    one_of_k_encoding(atom.GetTotalNumHs(), [0, 1, 2, 3, 4]) +
+                    one_of_k_encoding(atom.GetTotalValence(), [ 1, 2, 3, 4, 5, 6, 7]) +
+                    one_of_k_encoding(atom.GetHybridization(), [Chem.rdchem.HybridizationType.SP, 
+                          Chem.rdchem.HybridizationType.SP2, 
+                          Chem.rdchem.HybridizationType.SP3]) + 
+                    one_of_k_encoding(atom.IsInRing(),[True,False])+
+                    one_of_k_encoding(atom.GetIsAromatic(),[True,False]))
+                    
                     
 def one_of_k_encoding(x, allowable_set):
     if x not in allowable_set:
-        raise Exception("input {0} not in allowable set{1}:".format(x, allowable_set))
+        raise Exception("input {0} not in allowSable set{1}:".format(x, allowable_set))
     return list(map(lambda s: x == s, allowable_set))
-
-def one_of_k_encoding_unk(x, allowable_set):
-    """Maps inputs not in the allowable set to the last element."""
-    if x not in allowable_set:
-        x = allowable_set[-1]
-    return list(map(lambda s: x == s, allowable_set))
-
-def rmse(y,f):
-    rmse = sqrt(((y - f)**2).mean(axis=0))
-    return rmse
-
-def mse(y,f):
-    mse = ((y - f)**2).mean(axis=0)
-    return mse
-
-def pearson(y,f):
-    rp = np.corrcoef(y, f)[0,1]
-    return rp
-
-def spearman(y,f):
-    rs = stats.spearmanr(y, f)[0]
-    return rs
