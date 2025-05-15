@@ -10,8 +10,8 @@ from model import GCNnet
 from utils import *
 
 def train(model,device,train_loader,epoch,optimizer):  
-    # loss_fn = torch.nn.CrossEntropyLoss(label_smoothing=0.1)
-    loss_fn = torch.nn.BCEWithLogitsLoss()
+    loss_fn = torch.nn.CrossEntropyLoss()
+
     model = model.to(device)
     model.train()
 
@@ -19,12 +19,12 @@ def train(model,device,train_loader,epoch,optimizer):
         data = data.to(device)
         out = model(data)
         # print("out:\n",out)
-        loss = loss_fn(out, data.y.to(torch.float).to(device))
+        loss = loss_fn(out, data.y.to(torch.long).to(device))
+        # loss = loss_fn(out, data.y.to(torch.float).to(device))
         optimizer.zero_grad()
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
-        
+
     print('Train epoch: {:5d} /{:5d} [{:3.2f}%]\tLoss: {:.6f}'.format(epoch,
                                                                     NUM_EPOCHS,
                                                                     100. * (epoch) / NUM_EPOCHS,
@@ -41,8 +41,8 @@ def test(model, device, test_loader):
             data = data.to(device)
             out = model(data)
             print("out:\n",out)
-            pred = torch.nn.Sigmoid()(out)
-            print("pred:\n",pred)  
+            pred = torch.argmax(out, dim=1)
+            print("pred:\n",pred,"\ntrue:\n",data.y)  
             correct += (pred == data.y).sum().item()
             total += data.y.size(0)
     accuracy = 100. * correct / total
@@ -51,7 +51,7 @@ def test(model, device, test_loader):
 
 
 
-NUM_EPOCHS = 200
+NUM_EPOCHS = 500
 
 train_data,train_label = proccesed_data('data/train.csv')
 test_data,test_label = proccesed_data('data/test.csv')
@@ -63,11 +63,13 @@ val_loader = DataLoader(VSDataset(val_data,val_label),batch_size=64, shuffle=Fal
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
 model = GCNnet()
-optimizer = torch.optim.Adam(model.parameters(),lr=0.00001)
+optimizer = torch.optim.Adam(model.parameters(),lr=0.0001)
 
 
 for i in range(NUM_EPOCHS):
+    
     train(model, device, train_loader, i+1, optimizer)
+    
 
 
 test(model, device, test_loader)
