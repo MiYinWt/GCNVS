@@ -30,9 +30,6 @@ def atom_features(atom):
                     one_of_k_encoding(atom.GetDegree(), [0, 1, 2, 3, 4, 5]) +
                     one_of_k_encoding(atom.GetTotalNumHs(), [0, 1, 2, 3, 4]) +
                     one_of_k_encoding(atom.GetTotalValence(), [ 1, 2, 3, 4, 5, 6, 7]) +
-                    one_of_k_encoding(atom.GetHybridization(), [Chem.rdchem.HybridizationType.SP, 
-                          Chem.rdchem.HybridizationType.SP2, 
-                          Chem.rdchem.HybridizationType.SP3]) + 
                     one_of_k_encoding(atom.IsInRing(),[True,False])+
                     one_of_k_encoding(atom.GetIsAromatic(),[True,False]))
                     
