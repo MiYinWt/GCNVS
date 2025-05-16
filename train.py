@@ -25,6 +25,7 @@ def train(model,device,train_loader,epoch,optimizer):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         total_loss += loss.item()
     print('Train epoch: {:5d} /{:5d} [{:3.2f}%]\tLoss: {:.6f}'.format(epoch,
                                                                     NUM_EPOCHS,
@@ -41,9 +42,9 @@ def test(model, device, test_loader):
         for data in test_loader:
             data = data.to(device)
             out = model(data)
-            print("out:\n",out)
+            # print("out:\n",out)
             pred = torch.argmax(out, dim=1)
-            print("pred:\n",pred,"\ntrue:\n",data.y)  
+            # print("pred:\n",pred,"\ntrue:\n",data.y)  
             correct += (pred == data.y).sum().item()
             total += data.y.size(0)
     accuracy = 100. * correct / total
