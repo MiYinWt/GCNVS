@@ -27,10 +27,31 @@ def train(model,device,train_loader,epoch,optimizer):
         optimizer.step()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         total_loss += loss.item()
-    print('Train epoch: {:5d} /{:5d} [{:3.2f}%]\tLoss: {:.6f}'.format(epoch,
+    print('Train epoch: {:5d} /{:5d} [{:3.2f}%]\t Train tLoss: {:.6f}'.format(epoch,
                                                                     NUM_EPOCHS,
                                                                     100. * (epoch) / NUM_EPOCHS,
                                                                     total_loss / len(train_loader)))
+
+def validate(model, device, val_loader):
+    loss_fn = torch.nn.CrossEntropyLoss()
+
+    model = model.to(device)
+    model.eval()
+    total_loss = 0
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+        for batch_idx, data in enumerate(val_loader):
+            data = data.to(device)
+            out = model(data)
+            pred = torch.argmax(out, dim=1)
+            loss = loss_fn(out, data.y.to(torch.long).to(device))
+            correct += (pred == data.y).sum().item()
+            total += data.y.size(0)
+            total_loss += loss.item()
+        accuracy = 100. * correct / total
+        print(f'Validation Accuracy: {accuracy:.2f}%\t Validation Loss: {total_loss/len(val_loader):.6f}')
 
 
 def test(model, device, test_loader):
@@ -71,7 +92,5 @@ optimizer = torch.optim.Adam(model.parameters(),lr=0.0001)
 for i in range(NUM_EPOCHS):
     
     train(model, device, train_loader, i+1, optimizer)
-    
-
-
-test(model, device, test_loader)
+    validate(model, device, val_loader)
+    test(model, device, test_loader)
