@@ -25,17 +25,16 @@ class GCNnet(nn.Module):
         x = self.conv1(x, edge_index, edge_weights)
         #print("conv1:\n",x,edge_weights)
         x = self.bn1(x)
-        # x = self.relu(x)
+        x = self.relu(x)
         x = self.conv2(x, edge_index, edge_weights)
         x = self.bn2(x)
-        # x = self.relu(x)
-        x = self.conv3(x, edge_index, edge_weights)
-
         x = self.relu(x)
-
+        x = self.conv3(x, edge_index, edge_weights)
+        x = self.relu(x)
 
         x = gmp(x, batch)
 
+        x = self.dropout(x)
         x = self.fc1(x)
         x = self.relu(x)
         x = self.dropout(x)
