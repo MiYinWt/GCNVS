@@ -37,11 +37,11 @@ X_test = scaler.fit_transform(get_fingerprints(Smiles_test))
 
 
 # model = BernoulliNB()
-# model = LogisticRegression(max_iter=500)
+model = LogisticRegression(max_iter=500)
 # model = SVC(probability=True)
 # model = RandomForestClassifier(n_estimators=100)
 # model = DecisionTreeClassifier()
-model = KNeighborsClassifier(n_neighbors=5)
+# model = KNeighborsClassifier(n_neighbors=5)
 
 model.fit(X_train, y_train)
 
