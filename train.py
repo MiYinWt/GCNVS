@@ -31,6 +31,7 @@ def train(model,device,train_loader,epoch,optimizer):
                                                                     NUM_EPOCHS,
                                                                     100. * (epoch) / NUM_EPOCHS,
                                                                     total_loss / len(train_loader)))
+    return total_loss / len(train_loader)
 
 def validate(model, device, val_loader):
     loss_fn = torch.nn.CrossEntropyLoss()
@@ -62,6 +63,8 @@ def test(model, device, test_loader):
 
     all_probs = []
     all_labels = []
+    correct = 0
+    total = 0
     with torch.no_grad():  
         for data in test_loader:
             data = data.to(device)
@@ -75,10 +78,10 @@ def test(model, device, test_loader):
             all_probs.append(proba)
             all_labels.append(labels)
             # print("pred:\n",pred,"\ntrue:\n",data.y)  
-            # correct += (pred == data.y).sum().item()
-            # total += data.y.size(0)
-    # accuracy = 100. * correct / total
-    # print(f'Test Accuracy: {accuracy:.2f}%')
+            correct += (pred == labels).sum()
+            total += len(labels)
+    accuracy = 100. * correct / total
+    print(f'Test Accuracy: {accuracy:.4f}%')
     all_probs = np.concatenate(all_probs)
     all_labels = np.concatenate(all_labels)
 
@@ -123,13 +126,24 @@ val_loader = DataLoader(VSDataset(val_data,val_label),batch_size=64, shuffle=Fal
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
 model = GCNnet()
-optimizer = torch.optim.Adam(model.parameters(),lr=0.0001)
+optimizer = torch.optim.Adam(model.parameters(),lr=0.0001,weight_decay=1e-4)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=10, factor=0.5)
-
+train_losses = []
+val_losses = []
 for i in range(NUM_EPOCHS):
     
-    train(model, device, train_loader, i+1, optimizer)
+    train_loss = train(model, device, train_loader, i+1, optimizer)
     val_loss = validate(model, device, val_loader)
     scheduler.step(val_loss)
+    train_losses.append(train_loss)
+    val_losses.append(val_loss)
 
 test(model, device, test_loader)
+
+plt.plot(train_losses, label='Train Loss')
+plt.plot(val_losses, label='Validation Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Train & Validation Loss Curve')
+plt.show()
