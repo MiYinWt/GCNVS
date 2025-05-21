@@ -3,7 +3,7 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import  roc_auc_score
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
@@ -41,7 +41,7 @@ X_test = scaler.fit_transform(get_fingerprints(Smiles_test))
 # model = SVC(probability=True)
 # model = RandomForestClassifier(n_estimators=100)
 # model = DecisionTreeClassifier()
-model = KNeighborsRegressor(n_neighbors=5)
+model = KNeighborsClassifier(n_neighbors=5)
 
 model.fit(X_train, y_train)
 
