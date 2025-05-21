@@ -59,8 +59,7 @@ def validate(model, device, val_loader):
 def test(model, device, test_loader):
     model.eval()  
     model.to(device)
-    correct = 0
-    total = 0
+
     all_probs = []
     all_labels = []
     with torch.no_grad():  
@@ -69,8 +68,11 @@ def test(model, device, test_loader):
             out = model(data)
             # print("out:\n",out)
             pred = torch.argmax(out, dim=1).cpu().numpy()
+            # print("pred:\n",pred)
+            proba = torch.softmax(out,dim=1).cpu().numpy() 
+            proba = proba[:,1]
             labels = data.y.cpu().numpy()
-            all_probs.append(pred)
+            all_probs.append(proba)
             all_labels.append(labels)
             # print("pred:\n",pred,"\ntrue:\n",data.y)  
             # correct += (pred == data.y).sum().item()
@@ -116,8 +118,8 @@ test_data,test_label = proccesed_data('data/test.csv')
 val_data,val_label = proccesed_data('data/val.csv')
 
 train_loader = DataLoader(VSDataset(train_data,train_label),batch_size=64, shuffle=True)
-test_loader = DataLoader(VSDataset(test_data,test_label),batch_size=64, shuffle=True)
-val_loader = DataLoader(VSDataset(val_data,val_label),batch_size=64, shuffle=True)
+test_loader = DataLoader(VSDataset(test_data,test_label),batch_size=64, shuffle=False)
+val_loader = DataLoader(VSDataset(val_data,val_label),batch_size=64, shuffle=False)
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
 model = GCNnet()

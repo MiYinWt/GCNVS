@@ -1,5 +1,6 @@
 import os
 import torch
+from torch_geometric.utils import add_self_loops
 from torch_geometric.data import Dataset
 from torch_geometric import data as DATA
 from torch_geometric.transforms import Compose
@@ -57,9 +58,12 @@ def proccesed_data(data_path):
     data_list = []
     for i in range(len(smiles)):
         features, edge_index , edge_weights = smile_to_graph(smiles[i])
+        edge_index=torch.tensor(edge_index, dtype=torch.long).t().contiguous()
+        edge_weights=torch.tensor(edge_weights, dtype=torch.float)
+        edge_index,edge_weights = add_self_loops(edge_index,edge_weights)
         data = DATA.Data(x=torch.tensor(features, dtype=torch.float), 
-                          edge_index=torch.tensor(edge_index, dtype=torch.long).t().contiguous(), 
-                          edge_weights=torch.tensor(edge_weights, dtype=torch.float),
+                          edge_index=edge_index, 
+                          edge_weights=edge_weights,
                           )
         
         data_list.append(data)

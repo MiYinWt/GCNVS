@@ -9,15 +9,15 @@ class GCNnet(nn.Module):
     def __init__(self, num_features=32, dropout= 0.5):
         super(GCNnet, self).__init__()
 
-        self.conv1 = GCNConv(num_features, 256)
-        self.conv2 = GCNConv(256, 256)
-        self.conv3 = GCNConv(256, 128)
+        self.conv1 = GCNConv(num_features, 64)
+        self.conv2 = GCNConv(64, 128)
+        self.conv3 = GCNConv(128, 128)
         self.relu = ReLU()
         self.fc1 = Linear(128, 64)
         self.fc2 = Linear(64, 2)
         self.dropout = Dropout(dropout)
-        self.bn1 = nn.BatchNorm1d(256)
-        self.bn2 = nn.BatchNorm1d(256)
+        self.bn1 = nn.BatchNorm1d(64)
+        self.bn2 = nn.BatchNorm1d(128)
 
     def forward(self, data):
         x, edge_index, edge_weights,batch = data.x, data.edge_index ,data.edge_weights,data.batch
