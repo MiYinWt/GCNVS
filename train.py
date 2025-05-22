@@ -100,19 +100,6 @@ def test(model, device, test_loader):
     plt.legend(loc="lower right")
     plt.show()
 
-    # 计算最佳阈值下的TPR、TNR
-    best_idx = np.argmax(tpr - fpr)
-    best_threshold = thresholds[best_idx]
-    print(f"Best threshold: {best_threshold:.4f}")
-
-    pred_label = (all_probs >= best_threshold).astype(int)
-    tn, fp, fn, tp = confusion_matrix(all_labels, pred_label).ravel()
-    TPR = tp / (tp + fn)
-    TNR = tn / (tn + fp)
-    print(f"TPR (Recall): {TPR:.4f}")
-    print(f"TNR (Specificity): {TNR:.4f}")
-
-
 
 NUM_EPOCHS = 500
 
@@ -130,6 +117,7 @@ optimizer = torch.optim.Adam(model.parameters(),lr=0.0001,weight_decay=1e-4)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=10, factor=0.5)
 train_losses = []
 val_losses = []
+
 for i in range(NUM_EPOCHS):
     
     train_loss = train(model, device, train_loader, i+1, optimizer)
