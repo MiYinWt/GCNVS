@@ -7,6 +7,7 @@ import torch
 from torch_geometric.loader import DataLoader
 from dataset import *
 from model import GCNnet
+from scipy.interpolate import make_interp_spline
 from utils import *
 
 def train(model,device,train_loader,epoch,optimizer):  
@@ -128,8 +129,13 @@ for i in range(NUM_EPOCHS):
 
 test(model, device, test_loader)
 
-plt.plot(train_losses, label='Train Loss')
-plt.plot(val_losses, label='Validation Loss')
+plt.figure()
+window = 10  
+train_losses_smooth = pd.Series(train_losses).rolling(window, min_periods=1, center=True).mean()
+val_losses_smooth = pd.Series(val_losses).rolling(window, min_periods=1, center=True).mean()
+
+plt.plot(train_losses_smooth, label='Train Loss')
+plt.plot(val_losses_smooth, label='Validation Loss')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()

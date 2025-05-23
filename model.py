@@ -6,7 +6,7 @@ from torch_geometric.nn import GCNConv,GATConv, global_max_pool as gmp
 
 
 class GCNnet(nn.Module):
-    def __init__(self, num_features=32, dropout= 0.6):
+    def __init__(self, num_features=32, dropout= 0.7):
         super(GCNnet, self).__init__()
 
         self.conv1 = GATConv(num_features, num_features, heads=8)
@@ -19,26 +19,25 @@ class GCNnet(nn.Module):
         self.fc1 = Linear(512, 256)
         self.fc2 = Linear(256, 2)
         self.dropout = Dropout(dropout)
-        self.bn1 = nn.BatchNorm1d(512)
+
+        self.bn1 = nn.BatchNorm1d(num_features * 8)
         self.bn2 = nn.BatchNorm1d(512)
         self.bn3 = nn.BatchNorm1d(512)
 
     def forward(self, data):
         x, edge_index, edge_weights,batch = data.x, data.edge_index ,data.edge_weights,data.batch
         #print("x:\n",x,edge_weights)
-        x1 = self.conv1(x, edge_index, edge_weights)
-        x1 = self.relu(x1)
-
-        x2 = self.conv2(x1, edge_index, edge_weights)
-        x2 = self.bn1(x2)
-        x2 = self.relu(x2)
-
-        x = x2 + self.res_fc(x1) 
-        x = self.bn3(x)
+        x = self.conv1(x, edge_index, edge_weights)
+        x = self.bn1(x)
         x = self.relu(x)
 
-        x = self.conv3(x, edge_index, edge_weights)
+        x = self.conv2(x, edge_index, edge_weights)
         x = self.bn2(x)
+        x = self.relu(x)
+
+
+        x = self.conv3(x, edge_index, edge_weights)
+        x = self.bn3(x)
         x = self.relu(x)
 
         x = gmp(x, batch)
