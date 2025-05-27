@@ -88,7 +88,7 @@ def test(model, device, test_loader):
     fpr, tpr, thresholds = roc_curve(all_labels, all_probs)
     roc_auc = auc(fpr, tpr)
     print(f"AUC: {roc_auc:.4f}")
-       # 绘制ROC曲线
+    # draw ROC curve
     plt.figure()
     plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
@@ -114,7 +114,7 @@ def test(model, device, test_loader):
 
 
 
-NUM_EPOCHS = 500
+NUM_EPOCHS = 300
 
 train_data,train_label = proccesed_data('data/train.csv')
 test_data,test_label = proccesed_data('data/test.csv')
