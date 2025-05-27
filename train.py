@@ -7,6 +7,7 @@ import torch
 from torch_geometric.loader import DataLoader
 from dataset import *
 from model import GCNnet
+from scipy.interpolate import make_interp_spline
 from utils import *
 
 def train(model,device,train_loader,epoch,optimizer):  
@@ -100,19 +101,6 @@ def test(model, device, test_loader):
     plt.legend(loc="lower right")
     plt.show()
 
-    # 计算最佳阈值下的TPR、TNR
-    best_idx = np.argmax(tpr - fpr)
-    best_threshold = thresholds[best_idx]
-    print(f"Best threshold: {best_threshold:.4f}")
-
-    pred_label = (all_probs >= best_threshold).astype(int)
-    tn, fp, fn, tp = confusion_matrix(all_labels, pred_label).ravel()
-    TPR = tp / (tp + fn)
-    TNR = tn / (tn + fp)
-    print(f"TPR (Recall): {TPR:.4f}")
-    print(f"TNR (Specificity): {TNR:.4f}")
-
-
 
 NUM_EPOCHS = 300
 
@@ -130,6 +118,7 @@ optimizer = torch.optim.Adam(model.parameters(),lr=0.0001,weight_decay=1e-4)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=10, factor=0.5)
 train_losses = []
 val_losses = []
+
 for i in range(NUM_EPOCHS):
     
     train_loss = train(model, device, train_loader, i+1, optimizer)
@@ -140,8 +129,13 @@ for i in range(NUM_EPOCHS):
 
 test(model, device, test_loader)
 
-plt.plot(train_losses, label='Train Loss')
-plt.plot(val_losses, label='Validation Loss')
+plt.figure()
+window = 10  
+train_losses_smooth = pd.Series(train_losses).rolling(window, min_periods=1, center=True).mean()
+val_losses_smooth = pd.Series(val_losses).rolling(window, min_periods=1, center=True).mean()
+
+plt.plot(train_losses_smooth, label='Train Loss')
+plt.plot(val_losses_smooth, label='Validation Loss')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()

@@ -6,7 +6,7 @@ from torch_geometric.nn import GCNConv,GATConv, global_max_pool as gmp
 
 
 class GCNnet(nn.Module):
-    def __init__(self, num_features=32, dropout= 0.5):
+    def __init__(self, num_features=32, dropout= 0.7):
         super(GCNnet, self).__init__()
 
         self.conv1 = GATConv(num_features, num_features,heads=8, dropout=0.2)
@@ -40,7 +40,7 @@ class GCNnet(nn.Module):
         
 
         x = self.conv3(x, edge_index, edge_weights)
-        x = self.bn2(x)
+        x = self.bn3(x)
         x = self.relu(x)
         x = x + x1
 
