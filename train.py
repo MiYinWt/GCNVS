@@ -10,6 +10,13 @@ from model import GCNnet
 from scipy.interpolate import make_interp_spline
 from utils import *
 
+
+def mask_node_features(x, mask_ratio=0.1):
+    x = x.clone() 
+    mask = torch.rand(x.size(0)) < mask_ratio  
+    x[mask] = 0
+    return x
+
 def train(model,device,train_loader,epoch,optimizer):  
     loss_fn = torch.nn.CrossEntropyLoss()
 
@@ -19,6 +26,7 @@ def train(model,device,train_loader,epoch,optimizer):
     total_loss = 0
     for batch_idx,data in enumerate(train_loader):
         data = data.to(device)
+        data.x = mask_node_features(data.x, mask_ratio=0.1)  # Mask node features
         out = model(data)
         # print("out:\n",out)
         loss = loss_fn(out, data.y.to(torch.long).to(device))
@@ -102,7 +110,7 @@ def test(model, device, test_loader):
     plt.show()
 
 
-NUM_EPOCHS = 300
+NUM_EPOCHS = 500
 
 train_data,train_label = proccesed_data('data/train.csv')
 test_data,test_label = proccesed_data('data/test.csv')
@@ -130,7 +138,7 @@ for i in range(NUM_EPOCHS):
 test(model, device, test_loader)
 
 plt.figure()
-window = 10  
+window = 5  
 train_losses_smooth = pd.Series(train_losses).rolling(window, min_periods=1, center=True).mean()
 val_losses_smooth = pd.Series(val_losses).rolling(window, min_periods=1, center=True).mean()
 
