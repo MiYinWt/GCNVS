@@ -66,7 +66,7 @@ def validate(model, device, val_loader):
 
 
 
-def test(model, device, test_loader):
+def test(model, device, test_loader,i):
     model.eval()  
     model.to(device)
 
@@ -91,26 +91,27 @@ def test(model, device, test_loader):
             total += len(labels)
     accuracy = 100. * correct / total
     print(f'Test Accuracy: {accuracy:.4f}%')
-    all_probs = np.concatenate(all_probs)
-    all_labels = np.concatenate(all_labels)
+    while i+1 == NUM_EPOCHS:
+        all_probs = np.concatenate(all_probs)
+        all_labels = np.concatenate(all_labels)
 
-    fpr, tpr, thresholds = roc_curve(all_labels, all_probs)
-    roc_auc = auc(fpr, tpr)
-    print(f"AUC: {roc_auc:.4f}")
-    # draw ROC curve
-    plt.figure()
-    plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
-    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver Operating Characteristic')
-    plt.legend(loc="lower right")
-    plt.show()
+        fpr, tpr, thresholds = roc_curve(all_labels, all_probs)
+        roc_auc = auc(fpr, tpr)
+        print(f"AUC: {roc_auc:.4f}")
+        # draw ROC curve
+        plt.figure()
+        plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
+        plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver Operating Characteristic')
+        plt.legend(loc="lower right")
+        plt.show()
 
 
-NUM_EPOCHS = 500
+NUM_EPOCHS = 300
 
 train_data,train_label = proccesed_data('data/train.csv')
 test_data,test_label = proccesed_data('data/test.csv')
@@ -134,8 +135,7 @@ for i in range(NUM_EPOCHS):
     scheduler.step(val_loss)
     train_losses.append(train_loss)
     val_losses.append(val_loss)
-
-test(model, device, test_loader)
+    test(model, device, test_loader,i)
 
 plt.figure()
 window = 5  
