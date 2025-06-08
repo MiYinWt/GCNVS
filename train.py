@@ -1,7 +1,7 @@
 import  os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 from random import shuffle
-from sklearn.metrics import roc_curve,auc,confusion_matrix,roc_auc_score
+from sklearn.metrics import f1_score, roc_curve,auc,confusion_matrix,roc_auc_score
 import matplotlib.pyplot as plt
 import torch
 from torch_geometric.loader import DataLoader
@@ -90,11 +90,11 @@ def test(model, device, test_loader,i):
             correct += (pred == labels).sum()
             total += len(labels)
     accuracy = 100. * correct / total
-    print(f'Test Accuracy: {accuracy:.4f}%')
-    while i+1 == NUM_EPOCHS:
-        all_probs = np.concatenate(all_probs)
-        all_labels = np.concatenate(all_labels)
+    all_probs = np.concatenate(all_probs)
+    all_labels = np.concatenate(all_labels)
+    # print(f'Test Accuracy: {accuracy:.4f}%  F1_score: {f1_score(all_labels, np.round(all_probs)):.4f}  Recacll: {f1_score(all_labels, np.round(all_probs), average="macro"):.4f} recision: {f1_score(all_labels, np.round(all_probs), average="micro"):.4f}')
 
+    if i +1 == NUM_EPOCHS:
         fpr, tpr, thresholds = roc_curve(all_labels, all_probs)
         roc_auc = auc(fpr, tpr)
         print(f"AUC: {roc_auc:.4f}")
@@ -103,12 +103,14 @@ def test(model, device, test_loader,i):
         plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
         plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
         plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
+        plt.ylim([0.0, 1.0])
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
+        #plt.savefig('roc_curve.png')
         plt.show()
+        
 
 
 NUM_EPOCHS = 300

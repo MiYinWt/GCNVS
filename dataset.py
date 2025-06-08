@@ -34,8 +34,8 @@ def smile_to_graph(smile):
 
     for atom in mol.GetAtoms():
         feature = atom_features(atom)
-        # features.append( feature / sum(feature) )
-        features.append( feature )
+        features.append( feature / sum(feature) )
+        # features.append( feature )
 
     edge_index = []
     edge_weights = []

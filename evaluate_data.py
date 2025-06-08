@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 import pandas as pd
+import numpy as np
+from scipy.stats import norm
+import matplotlib.patheffects as pe
 data_path = 'data/total.csv'
 # 示例数据（假设从数据库获取的 SMILES 及其活性标签）
 df = pd.read_csv(data_path)
@@ -20,11 +23,4 @@ for i, mol in enumerate(mol_objects):
     else:
         mol_weights_inactive.append(Descriptors.MolWt(mol))
 
-# 绘制直方图
-plt.figure(figsize=(10, 6))
-plt.hist([mol_weights_active, mol_weights_inactive], bins=10, label=['Active', 'Inactive'], color=['green', 'orange'])
-plt.xlabel('MolWt')
-plt.ylabel('Count')
-plt.title('Molecular Weight Distribution')
-plt.legend()
-plt.show()
+
