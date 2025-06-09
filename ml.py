@@ -34,12 +34,11 @@ y_test = df_test['Label'].tolist()
 X_train = scaler.fit_transform(get_fingerprints(Smiles_train))
 X_test = scaler.fit_transform(get_fingerprints(Smiles_test))
 
-
 model = BernoulliNB()
 # model = LogisticRegression(max_iter=500)
 # model = SVC(probability=True)
 # model = RandomForestClassifier(n_estimators=100)
-# model = DecisionTreeClassifier()
+
 # model = KNeighborsClassifier(n_neighbors=10)
 
 model.fit(X_train, y_train)

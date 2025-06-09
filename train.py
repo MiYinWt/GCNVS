@@ -9,7 +9,8 @@ from dataset import *
 from model import GCNnet
 from scipy.interpolate import make_interp_spline
 from utils import *
-
+from rdkit import RDLogger
+RDLogger.DisableLog('rdApp.*')
 
 def mask_node_features(x, mask_ratio=0.1):
     x = x.clone() 
@@ -27,6 +28,7 @@ def train(model,device,train_loader,epoch,optimizer):
     for batch_idx,data in enumerate(train_loader):
         data = data.to(device)
         data.x = mask_node_features(data.x, mask_ratio=0.1)  # Mask node features
+        data.graph_features = mask_node_features(data.graph_features, mask_ratio=0.1)  # Mask graph features
         out = model(data)
         # print("out:\n",out)
         loss = loss_fn(out, data.y.to(torch.long).to(device))
@@ -93,7 +95,7 @@ def test(model, device, test_loader,i):
     all_probs = np.concatenate(all_probs)
     all_labels = np.concatenate(all_labels)
     # print(f'Test Accuracy: {accuracy:.4f}%  F1_score: {f1_score(all_labels, np.round(all_probs)):.4f}  Recacll: {f1_score(all_labels, np.round(all_probs), average="macro"):.4f} recision: {f1_score(all_labels, np.round(all_probs), average="micro"):.4f}')
-
+    print(f'Test Accuracy: {accuracy:.4f}%') 
     if i +1 == NUM_EPOCHS:
         fpr, tpr, thresholds = roc_curve(all_labels, all_probs)
         roc_auc = auc(fpr, tpr)
@@ -125,7 +127,7 @@ val_loader = DataLoader(VSDataset(val_data,val_label),batch_size=64, shuffle=Fal
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
 model = GCNnet()
-optimizer = torch.optim.Adam(model.parameters(),lr=0.0001,weight_decay=1e-4)
+optimizer = torch.optim.Adam(model.parameters(),lr=0.00001,weight_decay=1e-4)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=10, factor=0.5)
 train_losses = []
 val_losses = []

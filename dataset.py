@@ -4,11 +4,11 @@ from torch_geometric.utils import add_self_loops
 from torch_geometric.data import Dataset
 from torch_geometric import data as DATA
 from torch_geometric.transforms import Compose
-from rdkit import Chem
-from rdkit.Chem import MolFromSmiles
+from rdkit import Chem, RDLogger
+from rdkit.Chem import MolFromSmiles,AllChem
 import pandas as pd
 import networkx as nx
-
+RDLogger.DisableLog('rdApp.*')
 from utils import *
 
 class VSDataset(Dataset):
@@ -46,7 +46,11 @@ def smile_to_graph(smile):
         edge_index.append([e2, e1])
         edge_weights.append(bond_weight(bond))
         edge_weights.append(bond_weight(bond))
-    return  features, edge_index , edge_weights
+
+    graph_features = AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+    graph_features = torch.tensor(list(graph_features), dtype=torch.float)
+
+    return  features, edge_index , edge_weights, graph_features
 
 
 def proccesed_data(data_path):
@@ -57,13 +61,14 @@ def proccesed_data(data_path):
     assert len(smiles) == len(labels)
     data_list = []
     for i in range(len(smiles)):
-        features, edge_index , edge_weights = smile_to_graph(smiles[i])
+        features, edge_index , edge_weights, graph_features= smile_to_graph(smiles[i])
         edge_index=torch.tensor(edge_index, dtype=torch.long).t().contiguous()
         edge_weights=torch.tensor(edge_weights, dtype=torch.float)
         edge_index,edge_weights = add_self_loops(edge_index,edge_weights)
         data = DATA.Data(x=torch.tensor(features, dtype=torch.float), 
                           edge_index=edge_index, 
                           edge_weights=edge_weights,
+                          graph_features=graph_features
                           )
         
         data_list.append(data)
