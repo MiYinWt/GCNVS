@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import torch
 from torch_geometric.loader import DataLoader
 from dataset import *
-from model import GCNnet
+from model import GCNnet,CNN
 from scipy.interpolate import make_interp_spline
 from utils import *
 from rdkit import RDLogger
@@ -126,7 +126,8 @@ test_loader = DataLoader(VSDataset(test_data,test_label),batch_size=64, shuffle=
 val_loader = DataLoader(VSDataset(val_data,val_label),batch_size=64, shuffle=False)
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
-model = GCNnet()
+model = CNN()
+#model = GCNnet()
 optimizer = torch.optim.Adam(model.parameters(),lr=0.00001,weight_decay=1e-4)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=10, factor=0.5)
 train_losses = []
