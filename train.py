@@ -101,7 +101,7 @@ def test(model, device, test_loader,i):
         roc_auc = auc(fpr, tpr)
         print(f"AUC: {roc_auc:.4f}")
         # draw ROC curve
-        plt.figure()
+        plt.figure(dpi=300)
         plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
         plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
         plt.xlim([0.0, 1.0])
@@ -110,7 +110,7 @@ def test(model, device, test_loader,i):
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
-        #plt.savefig('roc_curve.png')
+        plt.savefig('roc_curve.png')
         plt.show()
         
 
@@ -141,7 +141,7 @@ for i in range(NUM_EPOCHS):
     val_losses.append(val_loss)
     test(model, device, test_loader,i)
 
-plt.figure()
+plt.figure(dpi=300)
 window = 5  
 train_losses_smooth = pd.Series(train_losses).rolling(window, min_periods=1, center=True).mean()
 val_losses_smooth = pd.Series(val_losses).rolling(window, min_periods=1, center=True).mean()
@@ -152,4 +152,5 @@ plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
 plt.title('Train & Validation Loss Curve')
+plt.savefig('loss_curve.png')
 plt.show()
