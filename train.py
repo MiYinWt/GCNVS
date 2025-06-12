@@ -1,21 +1,23 @@
 import  os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 from random import shuffle
-from sklearn.metrics import f1_score, roc_curve,auc,confusion_matrix,roc_auc_score
+from sklearn.metrics import f1_score, roc_curve,auc,f1_score,precision_score,recall_score
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 import torch
 from torch_geometric.loader import DataLoader
 from dataset import *
-from model import GCNnet
+from model import GCNnet,CNN
 from scipy.interpolate import make_interp_spline
 from utils import *
 from rdkit import RDLogger
 RDLogger.DisableLog('rdApp.*')
 
-def mask_node_features(x, mask_ratio=0.1):
+def mask_node_features(x, mask_ratio=0.1,noise_std=0.05):
     x = x.clone() 
-    mask = torch.rand(x.size(0)) < mask_ratio  
-    x[mask] = 0
+    mask = torch.rand(x.size(0)) < mask_ratio
+    noise = torch.randn_like(x[mask]) * noise_std
+    x[mask] += noise
     return x
 
 def train(model,device,train_loader,epoch,optimizer):  
@@ -95,9 +97,17 @@ def test(model, device, test_loader,i):
     all_probs = np.concatenate(all_probs)
     all_labels = np.concatenate(all_labels)
     # print(f'Test Accuracy: {accuracy:.4f}%  F1_score: {f1_score(all_labels, np.round(all_probs)):.4f}  Recacll: {f1_score(all_labels, np.round(all_probs), average="macro"):.4f} recision: {f1_score(all_labels, np.round(all_probs), average="micro"):.4f}')
-    print(f'Test Accuracy: {accuracy:.4f}%') 
+    # print(f'Test Accuracy: {accuracy:.4f}%') 
     if i +1 == NUM_EPOCHS:
         fpr, tpr, thresholds = roc_curve(all_labels, all_probs)
+        print(f'Test Accuracy: {accuracy:.4f}%') 
+        y_pred_bin = np.round(all_probs)  # 概率转为0/1
+        f1 = f1_score(all_labels, y_pred_bin)
+        precision = precision_score(all_labels, y_pred_bin)
+        recall = recall_score(all_labels, y_pred_bin)
+        print(f"F1 Score: {f1:.4f}")
+        print(f"Precision: {precision:.4f}")
+        print(f"Recall: {recall:.4f}")
         roc_auc = auc(fpr, tpr)
         print(f"AUC: {roc_auc:.4f}")
         # draw ROC curve
@@ -110,12 +120,12 @@ def test(model, device, test_loader,i):
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
-        plt.savefig('roc_curve.png')
+        # plt.savefig('roc_curve.png')
         plt.show()
         
 
 
-NUM_EPOCHS = 300
+NUM_EPOCHS = 200
 
 train_data,train_label = proccesed_data('data/train.csv')
 test_data,test_label = proccesed_data('data/test.csv')
@@ -127,6 +137,7 @@ val_loader = DataLoader(VSDataset(val_data,val_label),batch_size=64, shuffle=Fal
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
 model = GCNnet()
+# model = CNN()
 optimizer = torch.optim.Adam(model.parameters(),lr=0.00001,weight_decay=1e-4)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=10, factor=0.5)
 train_losses = []

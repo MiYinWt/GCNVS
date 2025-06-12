@@ -11,21 +11,21 @@ class GCNnet(nn.Module):
 
         self.conv1 = GATConv(num_features, num_features,heads=8,dropout=0.3)
     
-        self.conv2 = GCNConv(num_features * 8, 256)
-        self.conv3 = GCNConv(256, 1024)
+        self.conv2 = GCNConv(num_features * 8, 512)
+        self.conv3 = GCNConv(512, 1024)
         self.relu = ReLU()
 
         self.global_fc = nn.Sequential(
             nn.Linear(2048, 1024),
             nn.ReLU(),
-            nn.Linear(1024, 1024),
+            nn.Linear(1024, 2048),
             Dropout(dropout),
         )
 
-        self.fc1 = Linear(1024, 256)
-        self.fc2 = Linear(256, 2)
+        self.fc1 = Linear(1024*2, 512)
+        self.fc2 = Linear(512, 2)
         self.dropout = Dropout(dropout)
-        self.bn1 = nn.BatchNorm1d(256)
+        self.bn1 = nn.BatchNorm1d(512)
         self.bn2 = nn.BatchNorm1d(1024)
 
     def forward(self, data):
@@ -46,8 +46,8 @@ class GCNnet(nn.Module):
         x = self.relu(x)
 
         #x = x + g[batch]
-        # x = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
-        x = gmp(x, batch)
+        x = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
+        #　x = gmp(x, batch)
     
         x = x + g
         x = self.dropout(x)
@@ -84,6 +84,6 @@ class CNN(nn.Module):
         x = self.relu3(x)
         x = self.global_pool(x)
         x = x.view(x.size(0), -1)
-        x = self.dropout(x)
+        # x = self.dropout(x)
         out = self.fc(x)
         return out
